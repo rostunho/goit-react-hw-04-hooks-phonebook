@@ -2,7 +2,10 @@ import PropTypes from 'prop-types';
 import { Card, Info, Name, Number, DeleteButton } from './Contact.styled';
 import { CgProfile } from 'react-icons/cg';
 import { IoMdRemove } from 'react-icons/io';
-function Contact({ name, number, id, deleteContact }) {
+
+function Contact({ contact, deleteContact }) {
+  const { id, name, number } = contact;
+
   return (
     <Card>
       <CgProfile size="50px" color="var(--accent-color)" />
@@ -24,8 +27,8 @@ function Contact({ name, number, id, deleteContact }) {
 }
 
 Contact.propTypes = {
-  name: PropTypes.string.isRequired,
-  number: PropTypes.string.isRequired,
+  contact: PropTypes.object.isRequired,
+  deleteContact: PropTypes.func.isRequired,
 };
 
 export default Contact;

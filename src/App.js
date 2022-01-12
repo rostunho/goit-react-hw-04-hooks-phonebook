@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
+import { nanoid } from 'nanoid';
 
 import AppTitle from 'components/AppTitile/AppTitle';
 import ContactForm from 'components/ContactForm/ContactForm';
@@ -7,85 +8,93 @@ import Title from 'components/Title/Title';
 import Filter from 'components/Filter/Filter';
 import ContactList from 'components/ContactList/ContactList';
 
-class App extends Component {
-  state = {
-    contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    ],
-    filter: '',
-  };
+function App() {
+  const [contacts, setContacts] = useState([
+    { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+    { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+    { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+    { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+  ]);
+  const [newContact, setNewContact] = useState({
+    name: '',
+    number: '',
+  });
+  const [filter, setFilter] = useState('');
 
-  componentDidMount() {
-    const storageContacts = localStorage.getItem('contacts');
-    const savedContacts = JSON.parse(storageContacts);
+  useEffect(() => {
+    const unparsedContacts = window.localStorage.getItem('contacts');
+    const savedContacts = JSON.parse(unparsedContacts);
 
     console.log(savedContacts);
 
-    if (savedContacts) {
-      this.setState({ contacts: savedContacts });
-    }
+    savedContacts && setContacts(savedContacts);
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+
+  function handleInput(event) {
+    const { name, value } = event.target;
+    const contactUpdaiting = { id: nanoid(5), [name]: value };
+
+    setNewContact(prevContact => ({
+      ...prevContact,
+      ...contactUpdaiting,
+    }));
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.contacts !== this.state.contacts) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-    }
-  }
-
-  handleFilter = event => {
+  function handleFilter(event) {
     const { value } = event.target;
+    setFilter(value);
+  }
 
-    this.setState({ filter: value });
-  };
+  function addNewContact(event) {
+    event.preventDefault();
 
-  createNewContact = newContact => {
-    const { contacts } = this.state;
     const unUniqueContact = contacts.some(
       contact => contact.name.toLowerCase() === newContact.name.toLowerCase(),
     );
 
     unUniqueContact
       ? toast.error(`"${newContact.name}" is already in contacts`)
-      : this.setState(prevState => ({
-          contacts: [newContact, ...prevState.contacts],
-        }));
-  };
+      : setContacts(prevContacts => [newContact, ...prevContacts]);
 
-  removeContact = contactId => {
-    this.setState(prevState => ({
-      contacts: prevState.contacts.filter(contact => contact.id !== contactId),
-    }));
-  };
+    setNewContact({ name: '', number: '' });
+  }
 
-  render() {
-    const { contacts, filter } = this.state;
-
-    const normalizedFilter = filter.toLowerCase();
-    const filteredContacts = contacts.filter(contact =>
-      contact.name.toLowerCase().includes(normalizedFilter),
-    );
-
-    return (
-      <>
-        <AppTitle title="Phonebook" />
-        <ContactForm createContact={this.createNewContact} />
-        <Title title="Contacts" />
-        <Filter
-          filter={filter}
-          handleFilter={this.handleFilter}
-          placeholder="Find contacts by name"
-        />
-        <ContactList
-          filteredContacts={filteredContacts}
-          deleteContact={this.removeContact}
-        />
-        <Toaster position="top-right" />
-      </>
+  function removeContact(contactId) {
+    setContacts(prevContacts =>
+      prevContacts.filter(contact => contact.id !== contactId),
     );
   }
+
+  const normalizedFilter = filter.toLowerCase();
+  const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(normalizedFilter),
+  );
+
+  return (
+    <>
+      <AppTitle title="Phonebook" />
+      <ContactForm
+        newContact={newContact}
+        onInput={handleInput}
+        onSubmit={addNewContact}
+      />
+      <Title title="Contacts" />
+      <Filter
+        filter={filter}
+        handleFilter={handleFilter}
+        placeholder="Find contacts by name"
+      />
+      <ContactList
+        filteredContacts={filteredContacts}
+        deleteContact={removeContact}
+      />
+      <Toaster position="top-right" />
+    </>
+  );
 }
 
 export default App;

@@ -51,7 +51,6 @@ export const AddButton = styled.button`
   border: none;
   cursor: pointer;
   background-color: var(--accent-color);
-  /* background-color: tomato; */
 
   &:hover,
   :focus {

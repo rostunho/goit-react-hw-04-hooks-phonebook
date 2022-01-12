@@ -5,15 +5,9 @@ import { List, Item } from './ContactList.styled';
 function ContactList({ filteredContacts, deleteContact }) {
   return (
     <List>
-      {filteredContacts.map(({ id, name, number }) => (
-        <Item key={id}>
-          <Contact
-            name={name}
-            number={number}
-            id={id}
-            deleteContact={deleteContact}
-          />
-          {/* {name}: {number} */}
+      {filteredContacts.map(contact => (
+        <Item key={contact.id}>
+          <Contact contact={contact} deleteContact={deleteContact} />
         </Item>
       ))}
     </List>
@@ -22,6 +16,7 @@ function ContactList({ filteredContacts, deleteContact }) {
 
 ContactList.propTypes = {
   filteredContacts: PropTypes.array.isRequired,
+  deleteContact: PropTypes.func.isRequired,
 };
 
 export default ContactList;

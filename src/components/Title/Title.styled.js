@@ -12,12 +12,4 @@ export const SectionTitle = styled.h2`
   text-transform: uppercase;
   color: #fff;
   background-color: var(--accent-color);
-
-  /* background-image: repeating-linear-gradient(
-    to bottom,
-    #37acee,
-    #37acee 20px,
-    #5fc5ff 20px,
-    #5fc5ff 21px
-  ); */
 `;
