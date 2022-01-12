@@ -25,8 +25,6 @@ function App() {
     const unparsedContacts = window.localStorage.getItem('contacts');
     const savedContacts = JSON.parse(unparsedContacts);
 
-    console.log(savedContacts);
-
     savedContacts && setContacts(savedContacts);
   }, []);
 
