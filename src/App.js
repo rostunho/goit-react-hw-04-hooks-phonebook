@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import { nanoid } from 'nanoid';
 
 import AppTitle from 'components/AppTitile/AppTitle';
 import ContactForm from 'components/ContactForm/ContactForm';
@@ -17,50 +16,28 @@ function App() {
     return savedContacts ?? defaultContacts;
   });
 
-  const [newContact, setNewContact] = useState({
-    name: '',
-    number: '',
-  });
   const [filter, setFilter] = useState('');
-
-  // useEffect(() => {
-  //   const unparsedContacts = window.localStorage.getItem('contacts');
-  //   const savedContacts = JSON.parse(unparsedContacts);
-
-  //   savedContacts && setContacts(savedContacts);
-  // }, []);
 
   useEffect(() => {
     window.localStorage.setItem('contacts', JSON.stringify(contacts));
   }, [contacts]);
-
-  function handleInput(event) {
-    const { name, value } = event.target;
-    const contactUpdaiting = { id: nanoid(5), [name]: value };
-
-    setNewContact(prevContact => ({
-      ...prevContact,
-      ...contactUpdaiting,
-    }));
-  }
 
   function handleFilter(event) {
     const { value } = event.target;
     setFilter(value);
   }
 
-  function addNewContact(event) {
-    event.preventDefault();
-
+  function addNewContact(newContact) {
     const unUniqueContact = contacts.some(
       contact => contact.name.toLowerCase() === newContact.name.toLowerCase(),
     );
 
-    unUniqueContact
-      ? toast.error(`"${newContact.name}" is already in contacts`)
-      : setContacts(prevContacts => [newContact, ...prevContacts]);
-
-    setNewContact({ name: '', number: '' });
+    if (unUniqueContact) {
+      toast.error(`"${newContact.name}" is already in contacts`);
+    } else {
+      setContacts(prevContacts => [newContact, ...prevContacts]);
+      toast.success(`"${newContact.name}" added to your contacts`);
+    }
   }
 
   function removeContact(contactId) {
@@ -83,11 +60,7 @@ function App() {
   return (
     <>
       <AppTitle title="Phonebook" />
-      <ContactForm
-        newContact={newContact}
-        onInput={handleInput}
-        onSubmit={addNewContact}
-      />
+      <ContactForm addNewContact={addNewContact} />
       <Title title="Contacts" />
       <Filter
         filter={filter}
